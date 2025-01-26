@@ -237,7 +237,7 @@ Nous testons l'hypothèse nulle H0, les deux variables sont indépendantes contr
 
 Dans un premier temps, nous réaliserons ce test avec *zone* en tant que variable cible, avec *chaussures*, *age_categ* et *sexe*. Ensuite, nous réaliserons ce test entre *age_categ* et *chaussures*, *age_categ* et *sexe*, *chaussures* et *sexe*.
 
-```{r}
+```{r, echo=FALSE}
 
 resultat <- data.frame(
   variable_cible = character(),
@@ -293,40 +293,39 @@ resultat %>%
 
 ```
 
-# II. Modèle (à changer)
+# II. Modèles 
 
-Le modèle choisi est le suivant : MODELE TROP GROS a priori pour interpréter avec les odds
 
-$$malade = \beta_{0} + \beta_{1} * age + \beta_{2} * sexe + \beta_{3} * chaussuresyes  + \beta_{4} * zoneNord + \beta_{5} * zoneOuest + \beta_{6} * zoneSud $$
+## II.1 Modèles logistiques avec une variable qualitative
+
+La variable cible est *malade*, variable binaire où 1 représente une infection et 0 une absence d'infection.
+
+Tout d'abord, nous allons regarder différents modèles logistiques selon seulement une variable qualitative: chaussures ; age ; sexe. 
+
+Nous choisirons dans chaque variable, la modalité de référence comme la modalité la plus réprésentée dans l'échantillon afin d'obtenir une diminution de la variance des estimateurs. 
+
+### Variable chaussures 
+
+Les modalités possibles de la variable *chaussures* sont **no** ou **yes**. Voici le modèle considéré : 
+
+$$malade = \beta_{0} + \beta_{chaussureyes} * chaussureyes $$
+
+
+
 ```{r}
 ### MODELE DE REGRESSION ###
-res <- glm(malade ~ age + sexe + chaussures + zone, family="binomial", data=data)
-
-```
-
-Les valeurs des coefficients sont les suivantes:
-```{r, results='hide', echo=FALSE}
-### VALEURS DES COEFFICIENTS ###
-res$coefficients
-
-```
-| Variable       | Coefficient   | Notation          |
-|----------------|---------------|-------------------|
-| (Intercept)    | 0.80710299    | \(\hat{\beta_0}\) |
-| age            | 0.02076273    | \(\hat{\beta_1}\) |
-| sexe           | 0.11107693    | \(\hat{\beta_2}\) |
-| chaussuresyes  | -0.41702146   | \(\hat{\beta_3}\) |
-| zoneNord       | -0.55788369   | \(\hat{\beta_4}\) |
-| zoneOuest      | -0.38105327   | \(\hat{\beta_5}\) |
-| zoneSud        | -0.46207829   | \(\hat{\beta_6}\) |
-
-Intervalles de confiance: 
-
-```{r, echo=FALSE}
-### INTERVALLES DE CONFIANCE ###
+res <- glm(malade ~ chaussures, family="binomial", data=data)
+res
 confint(res, level=0.95)
 
 ```
+Nous obtenons $\beta_{1}=-0.2156$ et $IC_{95%} = [-0.5565847, 0.1268667]$.
+Le groupe de référence est représenté par la modélité "no". Ainsi la valeur obtenue pour $\beta_{chaussureyes} - \beta_{chaussureno} = ln(\frac{odds(malade=1|chaussures ="yes")}{odds(malade=1|chaussures="no")})$ est -0.2156, soit :
+
+$$\frac{odds(malade=1|chaussures="yes")}{odds(malade=1|chaussures="no")}= \exp(0.2156) = 0.806$$
+
+Ainsi, les individus portant des chaussures ont 
+
 
 # III. Prédictions 
 
