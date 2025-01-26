@@ -305,26 +305,30 @@ Tout d'abord, nous allons regarder différents modèles logistiques selon seulem
 Nous choisirons dans chaque variable, la modalité de référence comme la modalité la plus réprésentée dans l'échantillon afin d'obtenir une diminution de la variance des estimateurs. 
 
 ### Variable chaussures 
+```{r, echo=FALSE}
+table(data$chaussures)
 
-Les modalités possibles de la variable *chaussures* sont **no** ou **yes**. Voici le modèle considéré : 
+data$chaussures <- relevel(factor(data$chaussures), ref = "yes")
+```
 
-$$malade = \beta_{0} + \beta_{chaussureyes} * chaussureyes $$
+Les modalités possibles de la variable *chaussures* sont **no** ou **yes**. La modalité "no" représente 385 observations et "yes" 252 observations. Ainsi la modalité de référence déclarée sera "yes" et voici le modèle considéré : 
 
-
-
+$$malade = \beta_{0} + \beta_{chaussuresno} * chaussuresno $$
 ```{r}
-### MODELE DE REGRESSION ###
+### MODELE DE REGRESSION - VAR chaussures ###
 res <- glm(malade ~ chaussures, family="binomial", data=data)
 res
 confint(res, level=0.95)
 
 ```
-Nous obtenons $\beta_{1}=-0.2156$ et $IC_{95%} = [-0.5565847, 0.1268667]$.
-Le groupe de référence est représenté par la modélité "no". Ainsi la valeur obtenue pour $\beta_{chaussureyes} - \beta_{chaussureno} = ln(\frac{odds(malade=1|chaussures ="yes")}{odds(malade=1|chaussures="no")})$ est -0.2156, soit :
+Nous obtenons $\beta_{1}=0.2156$ et $IC_{95%} = [-0.1268667, 0.5565847]$.
+Le groupe de référence est représenté par la modélité "yes". Ainsi la valeur obtenue pour $\beta_{chaussuresno} - \beta_{chaussuresyes} = ln(\frac{odds(malade=1|chaussures ="no")}{odds(malade=1|chaussures="yes")})$ est 0.2156, soit :
 
-$$\frac{odds(malade=1|chaussures="yes")}{odds(malade=1|chaussures="no")}= \exp(0.2156) = 0.806$$
+$$\frac{odds(malade=1|chaussures="no")}{odds(malade=1|chaussures="yes")}= \exp(0.2156) = 1.24$$ 
 
-Ainsi, les individus portant des chaussures ont 
+Nous pouvons dire que la sous-population des personnes ne portant pas de chaussures a 1.24 fois plus de chance d'infection que la sous-population portant des chaussures. L'intervalle de confiance obtenue contient 0 et est large, il est difficile de conclure en raison de son imprécision.
+
+Cela semble contradictoire avec la manière dont sont infectés les individus.
 
 
 # III. Prédictions 
