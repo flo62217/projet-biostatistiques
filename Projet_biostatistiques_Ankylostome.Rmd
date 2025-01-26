@@ -29,7 +29,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ### LIBRAIRIES UTILISEES ###
 library(dplyr)
 library(ggplot2)
-
+library(gt)
 ```
 
 # Introduction 
@@ -167,7 +167,9 @@ pourcentages_malades <- prop.table(malades) * 100
 
 ```
 
-## I.3 Quelques analyses préliminaires via des graphiques
+## I.3 Quelques analyses préliminaires ...
+
+### I.3.a ...via des graphiques
 
 La répartition des sexes par zone géographique selon l'infection: 
 ```{r, fig.align='center', echo=FALSE}
@@ -222,6 +224,72 @@ ggplot(data_malade, aes(x = age_categ)) +
        x = "Âge",
        y = "Nombre de personnes infectées") +
   theme_minimal()
+
+```
+
+### I.3.a ...via le test du khi-deux
+
+Le $\chi^2$ permet de vérifier une relation entre deux variables qualitatives et de comparer des répartitions d'effectifs. Nous allons réaliser un text du khi-deux d'homogénéité et d'indépendance. 
+
+De plus, nous restons vigilants à la contrainte suivante : 80% des effectifs doivent être supérieurs à 5 individus.
+
+Nous testons l'hypothèse nulle H0, les deux variables sont indépendantes contre H1, il existe une relation entre les deux variables testées.
+
+Dans un premier temps, nous réaliserons ce test avec *zone* en tant que variable cible, avec *chaussures*, *age_categ* et *sexe*. Ensuite, nous réaliserons ce test entre *age_categ* et *chaussures*, *age_categ* et *sexe*, *chaussures* et *sexe*.
+
+```{r}
+
+resultat <- data.frame(
+  variable_cible = character(),
+  variable_testee = character(),
+  p_valeur = numeric(),
+  interpretation = character())
+
+tests <- list(
+  list(cible = "zone", testee = "chaussures"),
+  list(cible = "zone", testee = "age_categ"),
+  list(cible = "zone", testee = "sexe"),
+  list(cible = "age_categ", testee = "chaussures"),
+  list(cible = "age_categ", testee = "sexe"),
+  list(cible = "chaussures", testee = "sexe")
+  
+)
+
+for (test in tests) {
+  cible <- test$cible
+  testee <- test$testee
+    table_contingence <- table(data[[cible]], data[[testee]])
+  
+  if (any(chisq.test(table_contingence)$expected < 5)) {
+    p_valeur <- NA
+    interpretation <- "Test invalide (effectifs attendus < 5)"
+  } else {
+    test_resultat <- chisq.test(table_contingence)
+    p_valeur <- test_resultat$p.value
+    interpretation <- ifelse(
+      p_valeur < 0.05,
+      paste("Dépendance entre", cible, "et", testee),
+      paste("Indépendance entre", cible, "et", testee)
+    )
+  }
+  
+  resultat <- rbind(
+    resultat,
+    data.frame(
+      variable_cible = cible,
+      variable_testee = testee,
+      p_valeur = round(p_valeur, 4),
+      interpretation = interpretation
+    )
+  )
+}
+
+resultat %>%
+  gt() %>%
+  tab_header(
+    title = "Test du khi-deux",
+    subtitle = "Analyse des relations entre variables"
+  ) 
 
 ```
 
