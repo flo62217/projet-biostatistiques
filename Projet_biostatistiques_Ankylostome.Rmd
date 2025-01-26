@@ -227,7 +227,7 @@ ggplot(data_malade, aes(x = age_categ)) +
 
 ```
 
-### I.3.a ...via le test du khi-deux
+### I.3.b ...via le test du khi-deux
 
 Le $\chi^2$ permet de vérifier une relation entre deux variables qualitatives et de comparer des répartitions d'effectifs. Nous allons réaliser un text du khi-deux d'homogénéité et d'indépendance. 
 
