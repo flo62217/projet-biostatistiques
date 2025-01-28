@@ -316,9 +316,9 @@ Les modalités possibles de la variable *chaussures* sont **no** ou **yes**. La 
 $$malade = \beta_{0} + \beta_{chaussuresno} * chaussuresno $$
 ```{r}
 ### MODELE DE REGRESSION - VAR chaussures ###
-res <- glm(malade ~ chaussures, family="binomial", data=data)
-res
-confint(res, level=0.95)
+res_chaussures <- glm(malade ~ chaussures, family="binomial", data=data)
+res_chaussures
+confint(res_chaussures, level=0.95)
 
 ```
 Nous obtenons $\beta_{chaussuresno}=0.2156$ et $IC_{95%} = [-0.1268667, 0.5565847]$.
@@ -340,9 +340,9 @@ Les modalités possibles de la variable *sexe* sont **O** ou **1**. La modalité
 $$malade = \beta_{0} + \beta_{sexe0} * sexe0 $$
 ```{r}
 ### MODELE DE REGRESSION - VAR chaussures ###
-res <- glm(malade ~ sexe, family="binomial", data=data)
-res
-confint(res, level=0.95)
+res_sexe <- glm(malade ~ sexe, family="binomial", data=data)
+res_sexe
+confint(res_sexe, level=0.95)
 
 ```
 Nous obtenons $\beta_{sexe0}=-0.1992 $ et $IC_{95%} = [-0.5429823, 0.1469779]$.
