@@ -351,6 +351,60 @@ Le groupe de référence est représenté par la modélité "1"(femme). Ainsi la
 $$\frac{odds(malade=1|sexe="0")}{odds(malade=1|sexe="1")}= \exp(-0.1992) = 0.82$$ 
 Nous pouvons dire que la sous-population des hommes a 0.82 fois plus de chance d'infection que la sous-population représentant les femmes, soit que les hommes ont moins de chance d'être infectés. L'intervalle de confiance obtenue contient 0 et est large, il est difficile de conclure en raison de son imprécision.
 
+### Variable age
+
+```{r}
+## Modèle GLM avec la variable age
+res_age <- glm(malade ~ age_categ, family="binomial", data=data)
+res_age
+confint(res_age, level=0.95)
+```
+
+On voit que toutes les covariables ne contiennent pas 0 dans leur intervalle de confiance.
+
+$$\frac{odds(malade = 1|age\_categ = 5-10\ ans)}{odds(malade = 1|age\_categ = 0-4\ ans)}\geqslant exp(0.40)\approx 1.49$$
+Les individus de 5-10 ans ont plus de 1.49 fois plus de chance d'être malade que ceux de 0-4 ans
+$$\frac{odds(malade = 1|age\_categ = 10-18\ ans)}{odds(malade = 1|age\_categ = 0-4\ ans)}\geqslant exp(0.7)\approx 1.82$$
+
+Les individus de 10-18 ans ont plus de 1.82 fois plus de chance d'être malade que ceux de 0-4 ans
+$$\frac{odds(malade = 1|age\_categ = 19-30\ ans)}{odds(malade = 1|age\_categ = 0-4\ ans)}\geqslant exp(0.68)\approx 1.97$$
+
+Les individus de 19-30 ans ont plus de 1.97 fois plus de chance d'être malade que ceux de 0-4 ans
+
+$$\frac{odds(malade = 1|age\_categ = 31-60\ ans)}{odds(malade = 1|age\_categ = 0-4\ ans)}\geqslant exp(0.82)\approx 2.27$$
+
+Les individus de 31-60 ans ont plus de 2.27 fois plus de chance d'être malade que ceux de 0-4 ans
+
+$$\frac{odds(malade = 1|age\_categ = 60+\ ans)}{odds(malade = 1|age\_categ = 0-4\ ans)}\geqslant exp(0.82)\approx 2.27$$
+
+Les individus de 60 ans et plus ont plus de 2.27 fois plus de chance d'être malade que ceux de 0-4 ans
+
+### Modèle polytomique ordonné
+
+```{r}
+echelle_maladie <- function(x){
+  if (x == 0){
+    "pas malade"
+  }else if (x>0 & x < 2000){
+    "peu malade"
+  }else{
+    "très malade"
+  }
+}
+data$malade_echelle <- sapply(data$nb.oeufs,FUN = echelle_maladie)
+```
+
+```{r}
+library(MASS)
+data$malade_echelle <- as.factor(data$malade_echelle)
+res_polyt <- polr(malade_echelle~sexe ,data = data)
+levels(data$malade_echelle)
+```
+```{r}
+res_polyt
+```
+
+
 # III. Prédictions 
 
 ```{r, results='hide'}
