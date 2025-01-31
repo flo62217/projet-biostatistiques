@@ -2,12 +2,15 @@
 title: "Projet de biostatistiques - Ankylostome"
 author: "Amandine LIAGRE - Florian BUCQUET - Rachid ABDELJABBAR"
 date: "03-02-2024"
-output: 
+output:
+  html_document:
+    toc: true
+    toc_depth: '3'
+    df_print: paged
+  header-includes: \usepackage{xcolor}
   pdf_document:
     toc: true
-    toc_depth: 3  
-  header-includes:
-   - \usepackage{xcolor}
+    toc_depth: 3
 ---
 
 ```{=pdf}
@@ -171,6 +174,38 @@ pourcentages_malades <- prop.table(malades) * 100
 
 ### I.3.a ...via des graphiques
 
+La répartition des sexes par zone géographique selon le porte de chaussures : 
+
+```{r, fig.align='center', echo=FALSE}
+### répartition d'age par zone géographique selon la variable Sexe ###
+ggplot(data, aes(x = as.factor(chaussures), fill = as.factor(sexe))) +
+  geom_bar(position = "stack") +   
+  facet_wrap(~ zone) +             
+  labs(title = "Répartition de sexe selon porte chaussures et zone",
+       x = "Porte Chaussures",
+       y = "Nombre de cas",
+       fill = "Sexe") +   
+  scale_fill_manual(values = c("blue", "pink")) +  
+  theme_minimal()  
+
+```
+
+La répartition des personnes porte des chaussures selon l'âge par zone géographique : 
+
+```{r, fig.align='center', echo=FALSE}
+### répartition du port de chaussures par rapport au classe d'age ###
+ggplot(data, aes(x = ageclasses, fill = chaussures)) +
+  geom_bar(position = "stack") +   
+  facet_wrap(~ zone) +
+  labs(title = "Répartition du port de chaussures selon age",
+       x = "Âge",
+       y = "Nombre de cas",
+       fill = "Type de chaussures") +   
+  scale_fill_manual(values = c("lightblue", "orange")) +  
+  theme_minimal()  
+
+```
+
 La répartition des sexes par zone géographique selon l'infection: 
 ```{r, fig.align='center', echo=FALSE}
 ### répartition des sexes par zone géographique selon l'infection ###
@@ -247,12 +282,11 @@ resultat <- data.frame(
 
 tests <- list(
   list(cible = "zone", testee = "chaussures"),
-  list(cible = "zone", testee = "age_categ"),
+  list(cible = "zone", testee = "ageclasses"),
   list(cible = "zone", testee = "sexe"),
-  list(cible = "age_categ", testee = "chaussures"),
-  list(cible = "age_categ", testee = "sexe"),
+  list(cible = "ageclasses", testee = "chaussures"),
+  list(cible = "ageclasses", testee = "sexe"),
   list(cible = "chaussures", testee = "sexe")
-  
 )
 
 for (test in tests) {
@@ -319,13 +353,11 @@ $$malade = \beta_{0} + \beta_{chaussuresno} * chaussuresno $$
 res_chaussures <- glm(malade ~ chaussures, family="binomial", data=data)
 res_chaussures
 confint(res_chaussures, level=0.95)
-
 ```
 Nous obtenons $\beta_{chaussuresno}=0.2156$ et $IC_{95%} = [-0.1268667, 0.5565847]$.
 Le groupe de référence est représenté par la modélité "yes". Ainsi la valeur obtenue pour $\beta_{chaussuresno} - \beta_{chaussuresyes} = ln(\frac{odds(malade=1|chaussures ="no")}{odds(malade=1|chaussures="yes")})$ est 0.2156, soit :
 
 $$\frac{odds(malade=1|chaussures="no")}{odds(malade=1|chaussures="yes")}= \exp(0.2156) = 1.24$$ 
-
 Nous pouvons dire que la sous-population des personnes ne portant pas de chaussures a 1.24 fois plus de chance d'infection que la sous-population portant des chaussures. L'intervalle de confiance obtenue contient 0 et est large, il est difficile de conclure en raison de son imprécision.
 
 ### Variable sexe
@@ -355,25 +387,161 @@ Nous pouvons dire que la sous-population des hommes a 0.82 fois plus de chance d
 
 ```{r, results='hide'}
 ### PREDICTIONS ###
-vect_estimations <- round(res$fitted.values)
-
-#Effectif
-tab=table(data$malade, vect_estimations)
-tab
-
-#Proportion de personnes pour laquelle la prédiction a été mauvaise: 197 (1 + 196)
-#1. => 31%
-(tab[1,2] + tab[2,1])
-(tab[1,2] + tab[2,1])/sum(tab)
-
-#2. Proportion de personnes infectées pour laquelle la prédiction était non infecté: 31% (faux positifs)
-tab[1,2]/sum(tab[,2])
-
-#3. Proportion de personnes non infectées pour laquelle la prédiction était infectées => 50% (faux négatifs)
-tab[2,1]/sum(tab[,1])
+# vect_estimations <- round(res$fitted.values)
+# 
+# #Effectif
+# tab=table(data$malade, vect_estimations)
+# tab
+# 
+# #Proportion de personnes pour laquelle la prédiction a été mauvaise: 197 (1 + 196)
+# #1. => 31%
+# (tab[1,2] + tab[2,1])
+# (tab[1,2] + tab[2,1])/sum(tab)
+# 
+# #2. Proportion de personnes infectées pour laquelle la prédiction était non infecté: 31% (faux positifs)
+# tab[1,2]/sum(tab[,2])
+# 
+# #3. Proportion de personnes non infectées pour laquelle la prédiction était infectées => 50% (faux négatifs)
+# tab[2,1]/sum(tab[,1])
 
 ```
+## II.2 Modèles logistiques avec plus d'une variable qualitative
 
+### Relations entre les variables :
+
+* chaussures et ageclasses : p = 0.0000
+
+Il y a une relation significative entre le port de chaussures et les classes d'âge. Cela suggère que l'effet du port de chaussures sur la probabilité d'être malade pourrait dépendre de l'âge.
+
+* ageclasses et sexe : p = 0.0000
+
+Il y a une relation significative entre les classes d'âge et le sexe. Cela signifie que la distribution des classes d'âge varie selon le sexe.
+
+* chaussures et sexe : p = 0.0000
+
+Il y a une relation significative entre le port de chaussures et le sexe. Cela suggère que le port de chaussures pourrait varier selon le sexe.
+
+=> Ces relations significatives indiquent que :
+
+Les variables chaussures, ageclasses et sexe ne sont pas indépendantes.
+
+Il est important de considérer les interactions entre ces variables dans le modèle GLM pour capturer leurs effets combinés.
+
+### Option 1 : Modèle avec interactions entre port de chaussures et l'âge :
+
+$$
+\text{malade} = \beta_{0} + \beta_{chaussuresno} \text{chaussuresno} + \beta_{16-49} \text{ageclasses}_{16-49} + \beta_{49+} \text{ageclasses}_{49+} + \beta_1 (\text{chaussuresno} \times \text{ageclasses}_{16-49}) + \beta_2 (\text{chaussuresno} \times \text{ageclasses}_{49+})
+$$
+```{r}
+res_cha.age <- glm(malade ~ chaussures*ageclasses, family="binomial", data=data)
+res_cha.age
+confint(res_cha.age, level=0.95)
+```
+*) Coefficients du modèle
+
+Les coefficients indiquent l'effet de chaque variable sur la probabilité d'être malade (en log-odds). Une valeur positive augmente la probabilité, tandis qu'une valeur négative la diminue.
+
+* (Intercept) : 0.61310
+C'est la valeur de référence (log-odds) lorsque toutes les variables sont à leur niveau de référence ( chaussures = yes, ageclasses = moins de 16 ans).
+
+* chaussuresno : -0.19260
+
+Le fait de ne pas porter de chaussures (chaussures = no) diminue légèrement les log-odds d'être malade par rapport au port de chaussules, mais cet effet n'est pas significatif (l'intervalle de confiance à 95 % inclut 0).
+
+* ageclasses16-49 : 0.07244
+
+Les personnes âgées de 16 à 49 ans ont des log-odds légèrement plus élevés d'être malades que celles de moins de 16 ans, mais cet effet n'est pas significatif.
+
+* ageclasses49 et plus : 0.08004
+
+Les personnes de 49 ans et plus ont des log-odds légèrement plus élevés d'être malades que celles de moins de 16 ans, mais cet effet n'est pas significatif.
+
+* chaussuresno:ageclasses16-49 : 1.24753
+
+Il y a une interaction positive et significative entre le fait de ne pas porter de chaussures et la classe d'âge 16-49 ans. Cela signifie que, pour cette tranche d'âge, ne pas porter de chaussures augmente significativement les log-odds d'être malade.
+
+* chaussuresno:ageclasses49 et plus : 1.33204
+
+Il y a également une interaction positive entre le fait de ne pas porter de chaussures et la classe d'âge 49 ans et plus., mais cet effet n'est pas significatif.
+
+*) Conclusion du modèle : 
+
+L'interaction entre chaussuresno et ageclasses16-49 est significative, ce qui suggère que l'effet du port de chaussures sur la probabilité d'être malade dépend de l'âge pour cette tranche d'âge.
+
+Pour ageclasses49 et plus, l'interaction n'est pas significative, mais la valeur estimée est élevée (1.33204) avec un intervalle de confiance large. Cela pourrait indiquer un manque de puissance statistique due à un échantillon insuffisant dans cette tranche d'âge.
+
+Un modèle simplifié pourrait inclure uniquement l'interaction significative (chaussuresno:ageclasses16-49) 
+
+### Option 2 : Modèle avec interactions entre port de chaussures et le sexe :
+
+$$
+\text{malade} = \beta_{0} + \beta_{\text{chaussuresno}} \cdot \text{chaussuresno} + \beta_{\text{sexe0}} \cdot \text{Sexe}_{0} + \beta_{\text{interaction}} \cdot (\text{chaussuresno} \times \text{Sexe}_{0})
+$$
+```{r}
+res_cha.sex <- glm(malade ~ chaussures*sexe, family="binomial", data=data)
+res_cha.sex
+confint(res_cha.sex, level=0.95)
+```
+*) Coefficients du modèle
+
+*(Intercept) : 0.83130
+
+C'est la valeur de référence (log-odds) lorsque toutes les variables sont à leur niveau de référence(chaussures = yes,sexe = 1 les hommes).
+)
+
+* chaussuresno : 0.06252
+
+Le fait de ne pas porter de chaussures (chaussures = no) augmente légèrement les log-odds d'être malade par rapport au port de chaussures, mais cet effet n'est pas significatif (l'intervalle de confiance à 95 % inclut 0).
+
+* sexe0 : -0.23778
+
+Le sexe de référence sexe = 0 (les femmes) a des log-odds légèrement plus faibles d'être malade que le sexe de référence sexe = 1, mais cet effet n'est pas significatif.
+
+* chaussuresno:sexe0 : 0.22321
+
+Il y a une interaction positive entre le fait de ne pas porter de chaussures et le sexe sexe = 0. Cela signifie que, pour le sexe sexe = 0, ne pas porter de chaussures augmente légèrement les log-odds d'être malade. Cependant, cet effet n'est pas significatif.
+
+*) conclusion :
+
+le modèle n'identifie aucun effet significatif des variables explicatives (chaussures, sexe et leur interaction) sur la variable cible (malade)
+
+### Option 3 : Modèle avec interactions entre port de chaussures et sexe avec l'effet additif d'âge :
+
+$$
+\text{malade} = \beta_{0} + \beta_{\text{chaussuresno}} \cdot \text{chaussuresno} + \beta_{\text{sexe0}} \cdot \text{Sexe}_{0} + \beta_{\text{ageclasses16-49}} \cdot \text{ageclasses16-49} + \beta_{\text{ageclasses49 et plus}} \cdot \text{ageclasses49 et plus} + \beta_{\text{interaction}} \cdot (\text{chaussuresno} \times \text{Sexe}_{0})
+$$
+```{r}
+res_cha.age_sex <- glm(malade ~ chaussures*ageclasses + sexe, family="binomial", data=data)
+res_cha.age_sex
+confint(res_cha.age_sex, level=0.95)
+```
+*) Coefficients du modèle
+
+* ageclasses16-49 : 0.91803
+
+Les personnes âgées de 16 à 49 ans ont des log-odds significativement plus élevés d'être malades que celles de moins de 16 ans (la classe de référence).
+
+
+* ageclasses49 et plus : 1.02286
+
+Les personnes de 49 ans et plus ont des log-odds significativement plus élevés d'être malades que celles de moins de 16 ans (la classe de référence).
+
+* les autre coefficient sont non significatifs.
+
+cha* sexe + age : AIC: 775.6, cha* age + sexe : 769.7, sexe*age +chau : AIC: 776.9
+cha* age :AIC: 768.5, cha* sexe : AIC: 793.7
+
+### Comparaison des modèles 
+
+| Modèls          |AIC     |
+|-----------------|--------|
+|cha* sexe + age  | 775.6  |
+|cha* age + sexe  | 769.7  |
+|sexe*age +chau   | 776.9  |
+|cha* age         | 768.5  |
+|cha* sexe        | 793.7  |
+
+Selon le critère AIC, le meilleur modèle pour prédire la maladie est celui incluant l'interaction entre chaussures et âge (cha*age), car il présente la plus faible valeur d'AIC (768.5).
 
 # Conclusion 
 
