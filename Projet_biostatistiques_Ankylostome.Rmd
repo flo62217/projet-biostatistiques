@@ -105,7 +105,7 @@ head(data)
 La table de données contient 238 hommes et 399 femmes et ils sont répartis de la manière suivante selon la zone géographique: 
 
 
-```{r, echo=FALSE}
+```{r, echo=FALSE, out.width="40%", fig.align="center"}
 ### SEXE DES INDIVIDUS ###
 table_sexe <- table(data$sexe)
 
@@ -183,14 +183,14 @@ pourcentages_malades <- prop.table(malades) * 100
 
 ### I.3.a ...via des graphiques
 
-La répartition des sexes par zone géographique selon le porte de chaussures : 
+La répartition des sexes par zone géographique selon le port de chaussures : 
 
-```{r, fig.align='center', echo=FALSE}
+```{r, out.width="40%", fig.align='center', echo=FALSE}
 ### répartition d'age par zone géographique selon la variable Sexe ###
 ggplot(data, aes(x = as.factor(chaussures), fill = as.factor(sexe))) +
   geom_bar(position = "stack") +   
   facet_wrap(~ zone) +             
-  labs(title = "Répartition de sexe selon porte chaussures et zone",
+  labs(title = "Répartition des sexes par zone géographique selon le port de chaussures",
        x = "Porte Chaussures",
        y = "Nombre de cas",
        fill = "Sexe") +   
@@ -201,12 +201,12 @@ ggplot(data, aes(x = as.factor(chaussures), fill = as.factor(sexe))) +
 
 La répartition des personnes porte des chaussures selon l'âge par zone géographique : 
 
-```{r, fig.align='center', echo=FALSE}
+```{r, out.width="40%", fig.align="center", echo=FALSE}
 ### répartition du port de chaussures par rapport au classe d'age ###
 ggplot(data, aes(x = ageclasses, fill = chaussures)) +
   geom_bar(position = "stack") +   
   facet_wrap(~ zone) +
-  labs(title = "Répartition du port de chaussures selon age",
+  labs(title = "Répartition du port de chaussures selon l'âge et la zone géographique",
        x = "Âge",
        y = "Nombre de cas",
        fill = "Type de chaussures") +   
@@ -215,13 +215,13 @@ ggplot(data, aes(x = ageclasses, fill = chaussures)) +
 
 ```
 
-La répartition des sexes par zone géographique selon l'infection: 
-```{r, fig.align='center', echo=FALSE}
+La répartition des individus (malades ou non malades) selon le sexe et par zone géographique: 
+```{r, out.width="40%", fig.align="center", echo=FALSE}
 ### répartition des sexes par zone géographique selon l'infection ###
 ggplot(data, aes(x = as.factor(sexe), fill = as.factor(malade))) +
   geom_bar(position = "stack") +   
   facet_wrap(~ zone) +             
-  labs(title = "Répartition des malades par sexe et zone",
+  labs(title = "Répartition des malades ou non malades par sexe et zone",
        x = "Sexe",
        y = "Nombre de cas",
        fill = "État de l'infection") +   
@@ -232,7 +232,7 @@ ggplot(data, aes(x = as.factor(sexe), fill = as.factor(malade))) +
 
 La répartition des personnes infectées et le port de chaussures: 
 
-```{r, fig.align='center', echo=FALSE}
+```{r, out.width="40%", fig.align="center", echo=FALSE}
 ### répartition des personnes infectées et le port de chaussures ###
 ggplot(data, aes(x = chaussures, fill = as.factor(malade))) +
   geom_bar(position = "stack") +   
@@ -242,32 +242,6 @@ ggplot(data, aes(x = chaussures, fill = as.factor(malade))) +
        fill = "État de l'infection") +   
   scale_fill_manual(values = c("lightblue", "orange")) +  
   theme_minimal()  
-
-```
-
-La répartition des personnes infectées selon leur âge. Pour cela nous allons créer une nouvelle variable age_categ car les deux autres variables qui classent les âges ne nous semblent pas représentatives. Voici les tranches choisies: \newline
-- 0 à 5 ans exclus, \newline
-- 5 ans à 10 ans exclus, \newline
-- 10 ans à 18 ans exclus, \newline
-- 19 ans à 30 ans exclus, \newline
-- 30 à 60 ans exlus, \newline
-- les plus de 60 ans
-
-```{r, fig.align='center', echo=FALSE}
-### CREATION DES CLASSES D'AGE ET GRAPHIQUE ###
-data$age_categ <- cut(data$age, 
-                      breaks = c(0, 5, 10, 18, 30, 60, Inf), 
-                      labels = c("0-5 ans", "5-10 ans", "10-18 ans", "19-30 ans", "30-60 ans", "60+ ans"),
-                      right = FALSE) 
-
-data_malade <- subset(data, malade == 1)
-
-ggplot(data_malade, aes(x = age_categ)) +
-  geom_bar(fill = "lightblue") +
-  labs(title = "Répartition des personnes infectées par tranches d'âge",
-       x = "Âge",
-       y = "Nombre de personnes infectées") +
-  theme_minimal()
 
 ```
 
