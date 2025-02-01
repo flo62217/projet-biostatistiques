@@ -3,14 +3,14 @@ title: "Projet de biostatistiques - Ankylostome"
 author: "Amandine LIAGRE - Florian BUCQUET - Rachid ABDELJABBAR"
 date: "03-02-2024"
 output:
+  pdf_document:
+    toc: true
+    toc_depth: 3
+  header-includes: \usepackage{xcolor}
   html_document:
     toc: true
     toc_depth: '3'
     df_print: paged
-  header-includes: \usepackage{xcolor}
-  pdf_document:
-    toc: true
-    toc_depth: 3
 ---
 
 ```{=pdf}
@@ -37,9 +37,11 @@ library(gt)
 
 # Introduction 
 
-A travers ce projet, nous allons utiliser les données provenant d'une enquête réalisée sur un échantillon d'individus en Egypte. Plus particulièrement, nous avons des informations concernant l'infection des individus par l'ankylostome. En marchant pieds nus, les individus sont contaminés via les larves des ankylostomes vivant en terre. L'infection peut aussi se produire via une ingestion d'aliments contaminés par des larves. Les différents symptômes posibles sont des éruptions et lésions cutannées aux endroits où les larves ont pénétré la peau, de la fièvre, des douleurs épigastriques, des diarrhées, de la toux, inflammation de l'intestin ... . Dans les cas les plus graves, le malade peut être victime d'une perte de sang (les larves dans l'intestin se nourrissent de sang en étant accroché à sa paroi et il en résulte une potentielle anémie pour le malade), d'insuffisance cardiaque. Il existe des médicaments antiparasitaires pour traiter cette infection (albendazole, mébendazole). 
+## Contexte 
 
-L'ankylostome vit particulièrement bien dans la terre et une température aux alentours des 18°C afin que les oeufs puissent éclore. Les oeufs d'ankylostomes ont l'allure suivante:
+A travers ce projet, nous allons utiliser les données provenant d'une enquête réalisée sur un échantillon d'individus en Egypte. Plus particulièrement, nous avons des informations concernant l'infection des individus par l'ankylostome. Il s'agit d'un parasite intestinal. En marchant pieds nus, les individus sont directement contaminés via les larves des ankylostomes vivant en terre. L'infection peut aussi se produire via une ingestion d'aliments contaminés par des larves. Les différents symptômes possibles sont des éruptions et lésions cutanées aux endroits où les larves ont pénétré la peau, de la fièvre, des douleurs épigastriques, des diarrhées, de la toux, inflammation de l'intestin ... . Dans les cas les plus graves, le malade peut être victime d'une perte de sang (les larves dans l'intestin se nourrissent de sang en étant accroché à sa paroi et il en résulte une potentielle anémie pour le malade) et d'insuffisance cardiaque. Il existe des médicaments antiparasitaires pour traiter cette infection (albendazole, mébendazole). 
+
+L'ankylostome vit particulièrement bien dans la terre (plus précisément les sols humides) et une température aux alentours des 18°C afin que les oeufs puissent éclore. Les oeufs d'ankylostomes ont l'allure suivante:
 
 ![Oeufs d'Ankylostosme, par Joel Mills - CC BY-SA 3.0](egg.png){width=40%}
 
@@ -51,7 +53,16 @@ Voici le cycle parasitaire de l'ankylostome:
 
 ![Cycle parasitaire de l'ankylostome, par CDC - Department of Parasitic Diseases - Domaine public](Hookworm_LifeCycle.png){width=40%}
 
+Nous nous intéressons donc aux facteurs favorisant l'infection des individus en cherchant les relations entre les variables présentes dans la table de données (âge, sexe, port de chaussures, zone géographique) et la présence ou non d'une infection. Dans le but d'identifier les variables les plus importantes et donc les facteurs influants, nous utiliserons principalement les modèles logistiques (simples et polytomiques ordonnées).
+
+Quant aux données utilisées, il s'agit d'une enquête réalisée auprès de 637 individus avec diverses variables (nombre d'oeufs, intensité de la maladie, port de chaussures, ...) et nous allons créer une variable binaire *malade* afin de classer facilement les individus infectés. 
+
+
+Dans un premier temps, nous allons explorer les données (préparation, vérification des valeurs et quelques analyses descriptives) afin d'appréhender correctement nos données. Ensuite nous analyserons les relations entre les variables (test statistiques et visualisations graphiques). Dans un deuxième temps, nous mettrons en places des modèles de régression logistique pour comprendre l'influence des variables sur l'infection. Pour finir, nous sélectionnerons le meilleur modèle et évaluerons sa performance. 
+
+
 \newpage
+
 
 
 # I. Lecture des données et vérification 
