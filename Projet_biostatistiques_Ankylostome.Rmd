@@ -37,8 +37,6 @@ library(gt)
 
 # Introduction 
 
-## Contexte 
-
 A travers ce projet, nous allons utiliser les données provenant d'une enquête réalisée sur un échantillon d'individus en Egypte. Plus particulièrement, nous avons des informations concernant l'infection des individus par l'ankylostome. Il s'agit d'un parasite intestinal. En marchant pieds nus, les individus sont directement contaminés via les larves des ankylostomes vivant en terre. L'infection peut aussi se produire via une ingestion d'aliments contaminés par des larves. Les différents symptômes possibles sont des éruptions et lésions cutanées aux endroits où les larves ont pénétré la peau, de la fièvre, des douleurs épigastriques, des diarrhées, de la toux, inflammation de l'intestin ... . Dans les cas les plus graves, le malade peut être victime d'une perte de sang (les larves dans l'intestin se nourrissent de sang en étant accroché à sa paroi et il en résulte une potentielle anémie pour le malade) et d'insuffisance cardiaque. Il existe des médicaments antiparasitaires pour traiter cette infection (albendazole, mébendazole). 
 
 L'ankylostome vit particulièrement bien dans la terre (plus précisément les sols humides) et une température aux alentours des 18°C afin que les oeufs puissent éclore. Les oeufs d'ankylostomes ont l'allure suivante:
@@ -422,36 +420,39 @@ $$\frac{odds(malade = 1|age\_categ = 60+\ ans)}{odds(malade = 1|age\_categ = 0-4
 
 Les individus de 60 ans et plus ont plus de 2.27 fois plus de chance d'être malade que ceux de 0-4 ans
 
+### Comparaison des modèles - AIC
 
-
+| Modèles     |  AIC  |
+|-------------|-------|
+| chaussures  | 790.5 |
+| sexe        | 790.7 |
+| age         |       |
+ 
 
 ## II.2 Modèles logistiques avec plus d'une variable qualitative
 
-### Relations entre les variables :
+### Relations entre les variables
+
+D'après le test du khi-deux réalisé précédemment nous avions obtenu les résultats suivants:
 
 * chaussures et ageclasses : p = 0.0000
-
 Il y a une relation significative entre le port de chaussures et les classes d'âge. Cela suggère que l'effet du port de chaussures sur la probabilité d'être malade pourrait dépendre de l'âge.
 
 * ageclasses et sexe : p = 0.0000
-
 Il y a une relation significative entre les classes d'âge et le sexe. Cela signifie que la distribution des classes d'âge varie selon le sexe.
 
 * chaussures et sexe : p = 0.0000
-
 Il y a une relation significative entre le port de chaussures et le sexe. Cela suggère que le port de chaussures pourrait varier selon le sexe.
 
-=> Ces relations significatives indiquent que :
-
-Les variables chaussures, ageclasses et sexe ne sont pas indépendantes.
-
+Ainsi, Ces relations significatives indiquent que les variables chaussures, ageclasses et sexe ne sont pas indépendantes.
 Il est important de considérer les interactions entre ces variables dans le modèle GLM pour capturer leurs effets combinés.
 
-### Option 1 : Modèle avec interactions entre port de chaussures et l'âge :
+### Option 1 : Modèle avec interactions entre port de chaussures et l'âge 
 
 $$
 \text{malade} = \beta_{0} + \beta_{chaussuresno} \text{chaussuresno} + \beta_{16-49} \text{ageclasses}_{16-49} + \beta_{49+} \text{ageclasses}_{49+} + \beta_1 (\text{chaussuresno} \times \text{ageclasses}_{16-49}) + \beta_2 (\text{chaussuresno} \times \text{ageclasses}_{49+})
 $$
+
 ```{r}
 res_cha.age <- glm(malade ~ chaussures*ageclasses, family="binomial", data=data)
 res_cha.age
@@ -519,18 +520,20 @@ Il y a une interaction positive entre le fait de ne pas porter de chaussures et 
 
 ##### Conclusion du modèle
 
-le modèle n'identifie aucun effet significatif des variables explicatives (chaussures, sexe et leur interaction) sur la variable cible (malade)
+Le modèle n'identifie aucun effet significatif des variables explicatives (chaussures, sexe et leur interaction) sur la variable cible (malade)
 
 ### Option 3 : Modèle avec interactions entre port de chaussures et sexe avec l'effet additif d'âge :
 
 $$
 \text{malade} = \beta_{0} + \beta_{\text{chaussuresno}} \cdot \text{chaussuresno} + \beta_{\text{sexe0}} \cdot \text{Sexe}_{0} + \beta_{\text{ageclasses16-49}} \cdot \text{ageclasses16-49} + \beta_{\text{ageclasses49 et plus}} \cdot \text{ageclasses49 et plus} + \beta_{\text{interaction}} \cdot (\text{chaussuresno} \times \text{Sexe}_{0})
 $$
+
 ```{r}
 res_cha.age_sex <- glm(malade ~ chaussures*ageclasses + sexe, family="binomial", data=data)
 res_cha.age_sex
 confint(res_cha.age_sex, level=0.95)
 ```
+
 #### Coefficients du modèle
 * **ageclasses16-49 :** 0.91803
 
@@ -541,19 +544,23 @@ Les personnes âgées de 16 à 49 ans ont des log-odds significativement plus é
 
 Les personnes de 49 ans et plus ont des log-odds significativement plus élevés d'être malades que celles de moins de 16 ans (la classe de référence).
 
-* Les autre coefficient sont non significatifs.
+* Les autres coefficients sont non significatifs.
 
-| Modèle              | AIC   |
-|---------------------|-------|
-| cha * sexe + age    | 775.6 |
-| cha * age + sexe    | 769.7 |
-| sexe * age + chau   | 776.9 |
-| cha * age           | 768.5 |
-| cha * sexe          | 793.7 |
+### Comparaison des modèles - AIC
+
+| Modèles         |AIC     |
+|-----------------|--------|
+|cha* sexe + age  | 775.6  |
+|cha* age + sexe  | 769.7  |
+|sexe*age +chau   | 776.9  |
+|cha* age         | 768.5  |
+|cha* sexe        | 793.7  |
+
+Selon le critère AIC, le meilleur modèle pour prédire la maladie est celui incluant l'interaction entre chaussures et âge (cha*age), car il présente la plus faible valeur d'AIC (768.5).
 
 
 
-## Modèle polytomique ordonné
+## II.3 Modèle polytomique ordonné
 
 ```{r}
 echelle_maladie <- function(x){
@@ -577,18 +584,6 @@ levels(data$malade_echelle)
 ```{r}
 res_polyt
 ```
-
-# Comparaison des modèles 
-
-| Modèls          |AIC     |
-|-----------------|--------|
-|cha* sexe + age  | 775.6  |
-|cha* age + sexe  | 769.7  |
-|sexe*age +chau   | 776.9  |
-|cha* age         | 768.5  |
-|cha* sexe        | 793.7  |
-
-Selon le critère AIC, le meilleur modèle pour prédire la maladie est celui incluant l'interaction entre chaussures et âge (cha*age), car il présente la plus faible valeur d'AIC (768.5).
 
 
 # III. Prédictions 
