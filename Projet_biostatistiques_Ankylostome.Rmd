@@ -411,54 +411,9 @@ $$\frac{odds(malade = 1|age\_categ = 60+\ ans)}{odds(malade = 1|age\_categ = 0-4
 
 Les individus de 60 ans et plus ont plus de 2.27 fois plus de chance d'être malade que ceux de 0-4 ans
 
-### Modèle polytomique ordonné
-
-```{r}
-echelle_maladie <- function(x){
-  if (x == 0){
-    "pas malade"
-  }else if (x>0 & x < 2000){
-    "peu malade"
-  }else{
-    "très malade"
-  }
-}
-data$malade_echelle <- sapply(data$nb.oeufs,FUN = echelle_maladie)
-```
-
-```{r}
-library(MASS)
-data$malade_echelle <- as.factor(data$malade_echelle)
-res_polyt <- polr(malade_echelle~sexe ,data = data)
-levels(data$malade_echelle)
-```
-```{r}
-res_polyt
-```
 
 
-# III. Prédictions 
 
-```{r, results='hide'}
-### PREDICTIONS ###
-# vect_estimations <- round(res$fitted.values)
-# 
-# #Effectif
-# tab=table(data$malade, vect_estimations)
-# tab
-# 
-# #Proportion de personnes pour laquelle la prédiction a été mauvaise: 197 (1 + 196)
-# #1. => 31%
-# (tab[1,2] + tab[2,1])
-# (tab[1,2] + tab[2,1])/sum(tab)
-# 
-# #2. Proportion de personnes infectées pour laquelle la prédiction était non infecté: 31% (faux positifs)
-# tab[1,2]/sum(tab[,2])
-# 
-# #3. Proportion de personnes non infectées pour laquelle la prédiction était infectées => 50% (faux négatifs)
-# tab[2,1]/sum(tab[,1])
-
-```
 ## II.2 Modèles logistiques avec plus d'une variable qualitative
 
 ### Relations entre les variables :
@@ -585,7 +540,33 @@ Les personnes de 49 ans et plus ont des log-odds significativement plus élevés
 cha* sexe + age : AIC: 775.6, cha* age + sexe : 769.7, sexe*age +chau : AIC: 776.9
 cha* age :AIC: 768.5, cha* sexe : AIC: 793.7
 
-### Comparaison des modèles 
+
+## Modèle polytomique ordonné
+
+```{r}
+echelle_maladie <- function(x){
+  if (x == 0){
+    "pas malade"
+  }else if (x>0 & x < 2000){
+    "peu malade"
+  }else{
+    "très malade"
+  }
+}
+data$malade_echelle <- sapply(data$nb.oeufs,FUN = echelle_maladie)
+```
+
+```{r}
+library(MASS)
+data$malade_echelle <- as.factor(data$malade_echelle)
+res_polyt <- polr(malade_echelle~sexe ,data = data)
+levels(data$malade_echelle)
+```
+```{r}
+res_polyt
+```
+
+# Comparaison des modèles 
 
 | Modèls          |AIC     |
 |-----------------|--------|
@@ -596,6 +577,30 @@ cha* age :AIC: 768.5, cha* sexe : AIC: 793.7
 |cha* sexe        | 793.7  |
 
 Selon le critère AIC, le meilleur modèle pour prédire la maladie est celui incluant l'interaction entre chaussures et âge (cha*age), car il présente la plus faible valeur d'AIC (768.5).
+
+
+# III. Prédictions 
+
+```{r, results='hide'}
+### PREDICTIONS ###
+# vect_estimations <- round(res$fitted.values)
+# 
+# #Effectif
+# tab=table(data$malade, vect_estimations)
+# tab
+# 
+# #Proportion de personnes pour laquelle la prédiction a été mauvaise: 197 (1 + 196)
+# #1. => 31%
+# (tab[1,2] + tab[2,1])
+# (tab[1,2] + tab[2,1])/sum(tab)
+# 
+# #2. Proportion de personnes infectées pour laquelle la prédiction était non infecté: 31% (faux positifs)
+# tab[1,2]/sum(tab[,2])
+# 
+# #3. Proportion de personnes non infectées pour laquelle la prédiction était infectées => 50% (faux négatifs)
+# tab[2,1]/sum(tab[,1])
+
+```
 
 # Conclusion 
 
