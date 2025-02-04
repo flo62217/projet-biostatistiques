@@ -312,6 +312,25 @@ resultat %>%
 
 # II. Modèles 
 
+\paragraph{Introduction :} L'objectif de cette étude est de voir l'impact de certains critères et certaines comorbidités sur la possibilité d'infection d'ankylostomes, afin de donner des indications précises aux population sur les recommendations a suivre afin d'éviter une infection.
+
+Nous avons vu dans la partie précédente que le port de chaussures, l'age et le sexe sont indépendants de la zone géographique, nous décidons donc d'écarter la zone géographique de notre modèle. On va donc s'intéresser de savoir si l'age, le sexe, le port de chaussures ou une combinaison de ces facteurs ont un impact sur l'infection.
+
+Dans un second temps nous verrons également si ces variables ont un impact sur l'intensité de la maladie (qui est quantifié par la quantité d'oeufs dans les selles).
+
+Pour résumer nous aurons donc l'étude à l'aide de modèles logistiques de :
+* l'impact du port de chaussures sur l'infection (malade/pas malade),
+* l'impact du sexe de l'individu sur l'infection,
+* l'impact de la classe d'age de l'individu sur l'infection.
+
+et également des études avec plusieurs covariables et interaction :
+* l'impact du port de chaussures et de l'age de l'individu sur l'infection,
+* l'impact du port de chaussures et du sexe de l'individu sur l'infection,
+
+enfin en fonction de nos résultats, toutes les covariables avec un choix dans les intéraction (celles qui auront le plus intéragi dans la partie précédente).
+
+Pour finir nous verrons l'impact de l'augmentation de l'age sur l'intensité de l'infection en considérant toutes les covariables (afin d'avoir une interprétation pour un même profil (toutes choses égales par ailleurs)).
+
 
 ## II.1 Modèles logistiques avec une variable qualitative
 
@@ -377,9 +396,11 @@ confint(res_age, level=0.95)
 
 On voit que toutes les covariables ne contiennent pas 0 dans leur intervalle de confiance.
 
-$$\frac{odds(malade = 1|age\_categ = 16-49\ ans)}{odds(malade = 1|age\_categ = 0-15\ ans)}\geqslant exp(0.25)\approx 1.28$$
+$$\frac{odds(malade = 1|ageclasses = 16-49\ ans)}{odds(malade = 1|ageclasses = 0-15\ ans)}\geqslant exp(0.25)\approx 1.28$$
+
 Les individus de 16-49 ans ont plus de 1.28 fois plus de chance d'être malade que ceux de 0-15 ans
-$$\frac{odds(malade = 1|age\_categ = 49\ et\ plus\ ans)}{odds(malade = 1|age\_categ = 0-15\ ans)}\geqslant exp(0.15)\approx 1.16$$
+
+$$\frac{odds(malade = 1|ageclasses = 49\ et\ plus\ ans)}{odds(malade = 1|ageclasses = 0-15\ ans)}\geqslant exp(0.15)\approx 1.16$$
 
 Les individus de 49 ans et plus ont plus de 1.16 fois plus de chance d'être malade que ceux de 0-15 ans
 
@@ -389,7 +410,7 @@ Les individus de 49 ans et plus ont plus de 1.16 fois plus de chance d'être mal
 |-------------|-------|
 | chaussures  | 790.5 |
 | sexe        | 790.7 |
-| age         |       |
+| age         | 780.3 |
  
 
 ## II.2 Modèles logistiques avec plus d'une variable qualitative
