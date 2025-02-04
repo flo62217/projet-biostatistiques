@@ -586,7 +586,7 @@ confint(res_polyt)
 ```
 On a alors :
 
-$$\beta_{chaussures} = -ln\left(\frac{odds(malade\_echelle\leqslant pas\ malade|chaussures=no)}{odds(malade\_echelle\leqslant pas\ malade|chaussures=yes)}\right)$$
+$$\beta_{chaussures} = -ln\left(\frac{odds(malade\_echelle\leqslant pas\ malade|chaussures=no,age=x)}{odds(malade\_echelle\leqslant pas\ malade|chaussures=yes,age=x)}\right)$$
 $$exp(-\beta_{chaussures})\leqslant exp(-0.19)\approx 0.83$$
 Ne pas porter des chaussures va multiplier l'odds de pas malade par au maximum 0.83.
 
@@ -595,7 +595,7 @@ Ce qui revient à dire :
 
 Et aussi :
 
-$$\beta_{age} = -ln\left(\frac{odds(malade\_echelle\leqslant pas\ malade|age=x+1)}{odds(malade\_echelle\leqslant pas\ malade|age=x)}\right)$$
+$$\beta_{age} = -ln\left(\frac{odds(malade\_echelle\leqslant pas\ malade|age=x+1,chaussures=j)}{odds(malade\_echelle\leqslant pas\ malade|age=x,chaussures=j)}\right)$$
 
 $$exp(-\beta_{age})\leqslant exp(-0.01)\approx 0.99$$
 
