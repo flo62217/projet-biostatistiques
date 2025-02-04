@@ -324,7 +324,7 @@ Pour résumer nous aurons donc l'étude à l'aide de modèles logistiques de :
 * l'impact de la classe d'age de l'individu sur l'infection.
 
 et également des études avec plusieurs covariables et interaction :
-* l'impact du port de chaussures et de l'age de l'individu sur l'infection,
+* l'impact du port de chaussures et de la classe d'age de l'individu sur l'infection,
 * l'impact du port de chaussures et du sexe de l'individu sur l'infection,
 
 enfin en fonction de nos résultats, toutes les covariables avec un choix dans les intéraction (celles qui auront le plus intéragi dans la partie précédente).
@@ -387,13 +387,14 @@ Nous pouvons dire que la sous-population des hommes a 0.82 fois plus de chance d
 
 ### Variable age
 
-```{r}
+```{r, echo=FALSE}
 ## Modèle GLM avec la variable age
 res_age <- glm(malade ~ ageclasses, family="binomial", data=data)
 res_age
 confint(res_age, level=0.95)
 ```
-
+Le modèle considéré est :
+$$malade = \beta_{0} + \beta_{ageclasses\ 16-49} * ageclasses_{16-49} +  \beta_{ageclasses\ 49\ et\ plus}*ageclasses_{49\ et\ plus}$$
 On voit que toutes les covariables ne contiennent pas 0 dans leur intervalle de confiance.
 
 $$\frac{odds(malade = 1|ageclasses = 16-49\ ans)}{odds(malade = 1|ageclasses = 0-15\ ans)}\geqslant exp(0.25)\approx 1.28$$
@@ -546,7 +547,7 @@ Selon le critère AIC, le meilleur modèle pour prédire la maladie est celui in
 
 ## II.3 Modèle polytomique ordonné
 
-```{r}
+```{r, echo=FALSE}
 echelle_maladie <- function(x){
   if (x == 0){
     "pas malade"
@@ -559,27 +560,27 @@ echelle_maladie <- function(x){
 data$malade_echelle <- sapply(data$nb.oeufs,FUN = echelle_maladie)
 ```
 
-```{r}
+```{r, echo=FALSE}
 library(MASS)
 data$malade_echelle <- as.factor(data$malade_echelle)
 res_polyt <- polr(malade_echelle~chaussures+age+sexe ,data = data)
 levels(data$malade_echelle)
 ```
-```{r}
+```{r, echo=FALSE}
 res_polyt
 ```
 
-```{r}
+```{r, echo=FALSE}
 confint(res_polyt)
 ```
 On a alors :
 
-$$\beta_{chaussures} = -ln\left(\frac{odds(malade\_echelle\leqslant pas\ malade|chaussures=no)}{odds(malade\_echelle\leqslant pas\ malade|chaussures=yes)}\right)$$
-$$exp(-\beta_{chaussures})\leqslant exp(-0.19)\approx 0.83$$
-Ne pas porter des chaussures va multiplier l'odds de pas malade par au maximum 0.83.
+$$\beta_{chaussures} = -ln\left(\frac{odds(malade\_echelle\leqslant pas\ malade|chaussures=yes)}{odds(malade\_echelle\leqslant pas\ malade|chaussures=no)}\right)$$
+$$exp(-\beta_{chaussures})\geqslant exp(0.19)\approx 1.21$$
+Porter des chaussures va multiplier l'odds de pas malade par au moins 1.21.
 
 Ce qui revient à dire :
-"Toutes choses égales par ailleurs, le fait de ne pas porter de chaussures va diminuer les chances de ne pas être malade d'au moins 17%."
+"Toutes choses égales par ailleurs, le fait de porter des chaussures va augmenter les chances de ne pas être malade d'au moins 21%."
 
 Et aussi :
 
